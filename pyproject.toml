@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "rt-from-frequency-dynamics"
+name = "pf-clonal-dynamics"
 version = "0.1.0"
 description = ""
 authors = ["marlinfiggins <marlinfiggins@gmail.com>"]
