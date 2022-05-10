@@ -2,15 +2,6 @@ import datetime
 import numpy as np
 import pandas as pd
 
-
-def forecast_dates(dates, T_forecast):
-    last_date = dates[-1]
-    dates_f = []
-    for d in range(T_forecast):
-        dates_f.append(last_date + datetime.timedelta(days=d + 1))
-    return dates_f
-
-
 def prep_dates(raw_dates: pd.Series):
     _dates = pd.to_datetime(raw_dates)
     dmn = _dates.min()
@@ -20,7 +11,7 @@ def prep_dates(raw_dates: pd.Series):
     return dates, date_to_index
 
 
-def prep_cases(raw_cases: pd.DataFrame, date_to_index=None):
+def prep_density(raw_cases: pd.DataFrame, date_to_index=None):
     raw_cases["date"] = pd.to_datetime(raw_cases["date"])
     if date_to_index is None:
         _, date_to_index = prep_dates(raw_cases)
