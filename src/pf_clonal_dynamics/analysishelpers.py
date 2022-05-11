@@ -44,17 +44,18 @@ def fit_SVI(
         file_name = name.replace(" ", "-")
         SVIH.save_state(f"{path}/models/{file_name}_svi.p")
 
-    dataset = SVIH.predict(LM.model, guide, data, num_samples=num_samples)
+    dataset = SVIH.predict(PM.model, guide, data, num_samples=num_samples)
     return PosteriorHandler(dataset=dataset, data=VD, name=name)
 
-def fit_MCMC(VD, PM, kernel, num_samples=1000, num_warmup=500, path=".", name="Test", load=False, save=False):
+def fit_MCMC(VD, PM, kernel=None, num_samples=1000, num_warmup=500, path=".", name="Test", load=False, save=False):
     # Defining MCMC algorithm
     MC = MCMCHandler(kernel=kernel)
     # Unpacking data
     data = VD.make_numpyro_input()
+    PM.augment_data(data)
     MC.fit(PM.model, data, num_warmup, num_samples)
-    dataset = MC.predict(PM.model, data, num_samples = num_samples)
-    return PosteriorHandler(dataset=dataset,data=VD, name=name)  
+    # dataset = MC.predict(PM.model, data, num_samples = num_samples)
+    return PosteriorHandler(dataset=MC.samples, data=VD, name=name)  
 
 def save_posteriors(MP, path):
     for name, p in MP.locator.items():

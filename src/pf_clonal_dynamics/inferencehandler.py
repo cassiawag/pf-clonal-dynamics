@@ -75,7 +75,7 @@ class SVIHandler:
         predictive = Predictive(model, samples)
 
         self.rng_key, rng_key_ = random.split(rng_key)
-        return predictive(rng_key, **data)
+        return {**samples, **predictive(self.rng_key, **data)}
 
     def reset_state(self):
         return SVIHandler(self.rng_key, self.loss, self.optimizer)
@@ -97,7 +97,9 @@ class SVIHandler:
 
 
 class MCMCHandler:
-    def __init__(self, rng_key=1, kernel=NUTS):
+    def __init__(self, rng_key=1, kernel=None):
+        if kernel is None:
+            kernel = NUTS
 
         self.rng_key = random.PRNGKey(rng_key)
         self.kernel = kernel

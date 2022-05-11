@@ -22,5 +22,4 @@ class VariantData:
         data["parasite_density"] = self.density
         data["seq_counts"] = self.seq_counts
         data["N"] = self.seq_counts.sum(axis=1)
-        data["seq_names"] = self.seq_names
         return data

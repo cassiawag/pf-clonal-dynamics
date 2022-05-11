@@ -82,36 +82,7 @@ def plot_posterior_time(ax, t, med, quants, alphas, colors, included=None):
             )
         ax.plot(t[v_included], med[v_included, variant], color=colors[variant])
 
-
-def plot_R(ax, dataset, ps, alphas, colors, forecast=False):
-    t, med, quants = prep_posterior_for_plot("R", dataset, ps, forecast=forecast)
-    ax.axhline(y=1.0, color="k", linestyle="--")
-    plot_posterior_time(ax, t, med, quants, alphas, colors)
-
-
-def plot_R_censored(ax, dataset, ps, alphas, colors, forecast=False, thres=0.001):
-    t, med, quants = prep_posterior_for_plot("R", dataset, ps, forecast=forecast)
-    ax.axhline(y=1.0, color="k", linestyle="--")
-
-    # Plot only variants at high enough frequency
-    _, freq_median, _ = prep_posterior_for_plot("freq", dataset, ps, forecast=forecast)
-    included = freq_median > thres
-
-    plot_posterior_time(ax, t, med, quants, alphas, colors, included=included)
-
-
-def plot_posterior_average_R(ax, dataset, ps, alphas, color):
-    med, V = get_quantiles(dataset, ps, "R_ave")
-    t = jnp.arange(0, V[-1].shape[-1], 1)
-
-    # Make figure
-    ax.axhline(y=1.0, color="k", linestyle="--")
-    for i in range(len(ps)):
-        ax.fill_between(t, V[i][0, :], V[i][1, :], color=color, alpha=alphas[i])
-    ax.plot(t, med, color=color)
-
-
-def plot_little_r_censored(
+def plot_growth_rates(
     ax, dataset, ps, alphas, colors, forecast=False, thres=0.001
 ):
     t, med, quants = prep_posterior_for_plot("r", dataset, ps, forecast=forecast)
@@ -136,7 +107,6 @@ def plot_observed_frequency(ax, LD, colors):
     for variant in range(N_variant):
         ax.scatter(t, obs_freq[:, variant], color=colors[variant], edgecolor="black")
 
-
 def plot_observed_frequency_size(ax, LD, colors, size):
     N = LD.seq_counts.sum(axis=1)[:, None]
     sizes = [size(n) for n in N]
@@ -149,13 +119,13 @@ def plot_observed_frequency_size(ax, LD, colors, size):
         )
 
 
-def plot_posterior_I(ax, dataset, ps, alphas, colors, forecast=False):
-    t, med, quants = prep_posterior_for_plot("I_smooth", dataset, ps, forecast=forecast)
+def plot_posterior_parasite_density(ax, dataset, ps, alphas, colors, forecast=False):
+    t, med, quants = prep_posterior_for_plot("variant_specific_P", dataset, ps, forecast=forecast)
     plot_posterior_time(ax, t, med, quants, alphas, colors)
 
 
-def plot_posterior_smooth_EC(ax, dataset, ps, alphas, color):
-    med, V = get_quantiles(dataset, ps, "total_smooth_prev")
+def plot_posterior_smooth_EPD(ax, dataset, ps, alphas, color):
+    med, V = get_quantiles(dataset, ps, "expected_parasite_density")
     t = jnp.arange(0, V[-1].shape[-1], 1)
 
     # Make figure
@@ -164,9 +134,9 @@ def plot_posterior_smooth_EC(ax, dataset, ps, alphas, color):
     ax.plot(t, med, color=color)
 
 
-def plot_cases(ax, LD):
-    t = jnp.arange(0, LD.cases.shape[0])
-    ax.bar(t, LD.cases, color="black", alpha=0.3)
+def plot_parasite_density(ax, LD):
+    t = jnp.arange(0, LD.density.shape[0])
+    ax.bar(t, LD.density, color="black", alpha=0.3)
 
 
 def add_dates(ax, dates, sep=1):
@@ -189,32 +159,6 @@ def add_dates_sep(ax, dates, sep=7):
             t.append(i)
     ax.set_xticks(t)
     ax.set_xticklabels(labels)
-
-
-def plot_growth_advantage(ax, dataset, LD, ps, alphas, colors):
-    ga = jnp.array(dataset["ga"])
-
-    inds = jnp.arange(0, ga.shape[-1], 1)
-
-    ax.axhline(y=1.0, color="k", linestyle="--")
-    parts = ax.violinplot(
-        ga.T, inds, showmeans=False, showmedians=False, showextrema=False
-    )
-
-    for i, pc in enumerate(parts["bodies"]):
-        pc.set_facecolor(colors[i])
-        pc.set_edgecolor("black")
-        pc.set_alpha(1)
-
-    q1, med, q3 = jnp.percentile(ga, jnp.array([25, 50, 75]), axis=0)
-    ax.scatter(inds, med, color="white", zorder=3, edgecolor="black")
-    ax.vlines(inds, q1, q3, color="k", lw=4, zorder=2)
-
-    q1, med, q3 = jnp.percentile(ga, jnp.array([2.5, 50, 97.5]), axis=0)
-    ax.vlines(inds, q1, q3, color="k", lw=2, zorder=1)
-
-    ax.set_xticks(inds)
-    ax.set_xticklabels(LD.seq_names[:-1])
 
 
 def plot_total_by_obs_frequency(ax, LD, total, colors):
