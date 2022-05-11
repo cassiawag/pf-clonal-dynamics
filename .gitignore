@@ -7,14 +7,6 @@ Desktop.ini
 posteriors/
 models/
 
-# Intermediate data prep files
-metadata.tsv.gz
-open_metadata.tsv
-open_metadata_pruned.tsv
-gisaid_metadata.tsv
-gisaid_metadata_pruned.tsv
-sfs_counts.csv
-
 # Protect environment variables
 environment*
 
@@ -31,9 +23,6 @@ environment*
 *.cb
 *.cb2
 .*.lb
-
-# Keep final manuscript PDF from being versioned
-rt-from-frequency-dynamics.pdf
 
 ## Intermediate documents:
 *.dvi
@@ -56,4 +45,4 @@ rt-from-frequency-dynamics.pdf
 *.synctex.gz(busy)
 *.pdfsync
 
-src/rt_from_frequency_dynamics/__pycache__
+src/pf_clonal_dynamics/__pycache__
